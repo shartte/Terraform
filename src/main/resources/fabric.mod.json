@@ -1,37 +1,33 @@
 {
   "schemaVersion": 1,
   "id": "terraform",
+  "version": "${version}",
   "name": "Terraform",
-  "version": "$version",
-  "environment": "*",
-  "entrypoints": {
-    "client": [
-      "com.terraformersmc.terraform.client.network.BoatSpawnNetworkHandler::register"
-    ]
-  },
-  "license": "LGPL-3.0",
-  "icon": "assets/terraform/icon.png",
-  "contact": {
-    "homepage": "https://github.com/TerraformersMC/Terraform",
-    "issues": "https://github.com/TerraformersMC/Terraform/issues"
-  },
-  "depends": {
-    "fabric": "*"
-  },
+  "description": "Base library for the Terraformers' mods",
   "authors": [
+    "TerraformersMC",
     "Prospector",
-    "coderbot16",
-    "TerraformersMC"
+    "coderbot16"
   ],
   "contributors": [
     "SuperCoder79",
-    "NeusFear"
+    "NeusFear",
+    "Vaerian"
   ],
-  "description": "Base library for the Terraformers' mods",
+  "contact": {
+    "homepage": "https://github.com/TerraformersMC/Terraform",
+    "sources": "https://github.com/TerraformersMC/Terraform",
+    "issues": "https://github.com/TerraformersMC/Terraform/issues"
+  },
+  "license": "LGPL-3.0",
+  "icon": "assets/terraform/icon.png",
+  "environment": "*",
   "custom": {
     "modmenu:api": true
   },
-  "mixins": [
-    "mixins.terraform.json"
-  ]
+  "depends": {
+    "fabricloader": ">=0.7.4",
+    "fabric": "*",
+    "minecraft": ">1.16.1"
+  }
 }

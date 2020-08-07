@@ -1,0 +1,2 @@
+archivesBaseName = "terraform-base"
+version = getSubprojectVersion(project, "1.0.0")

@@ -1,12 +1,18 @@
 pluginManagement {
     repositories {
         jcenter()
+        gradlePluginPortal()
         maven {
             name = 'Fabric'
             url = 'https://maven.fabricmc.net/'
         }
-        gradlePluginPortal()
+        mavenLocal()
     }
 }
 
 rootProject.name = "terraform"
+
+include 'terraform-base'
+
+include 'terraform-biome-builder-v0'
+include 'terraform-shapes-v0'

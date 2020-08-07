@@ -1,78 +1,185 @@
 plugins {
-    id 'java'
-    id 'maven-publish'
-    id 'idea'
-    id 'eclipse'
-    id 'fabric-loom' version '0.4.13'
+	id 'java'
+	id 'eclipse'
+	id 'idea'
+	id 'maven-publish'
+	id 'fabric-loom' version '0.4-SNAPSHOT'
+	id 'net.minecrell.licenser' version '0.4.1'
+	id "org.ajoberstar.grgit" version "3.1.1"
+	id 'com.matthewprenger.cursegradle' version "1.4.0"
 }
-
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
-
-archivesBaseName = project.archive_name
-version = project.mod_version
-group = project.maven_group
 
 def ENV = System.getenv()
-version = version + "+" + (ENV.BUILD_NUMBER ? ("build." + ENV.BUILD_NUMBER) : "custom")
+
+class Globals {
+	/****************************
+	 * Environment dependencies *
+	 ****************************/
+
+	static def mod_version = "3.0.0"
+	static def minecraft_version = "1.16.2-rc1"
+	static def yarn_version = "+build.4"
+	static def loader_version = "0.9.0+build.204"
+
+	/********************
+	 * Mod dependencies *
+	 ********************/
+
+	static def fabric_version = "0.16.4+build.392-1.16"
+
+	/********************
+	 * Dev dependencies *
+	 ********************/
+
+	static def modmenu_version = "1.14.6+build.31"
+}
+
+version = Globals.mod_version + "+" + (ENV.BUILD_NUMBER ? ("build." + ENV.BUILD_NUMBER) : "custom") + "-" + getBranch()
+
+import org.apache.commons.codec.digest.DigestUtils
+
+def getSubprojectVersion(project, version) {
+	if (grgit == null) {
+		return version + "+nogit"
+	}
+	def latestCommits = grgit.log(paths: [project.name], maxCommits: 1)
+	if (latestCommits.isEmpty()) {
+		return version + "+uncommited"
+	} else {
+		return version + "+" + latestCommits.get(0).id.substring(0, 8) + DigestUtils.sha256Hex(Globals.minecraft_version)
+	}
+}
+
+def getBranch() {
+	if (System.getenv().GIT_BRANCH) {
+		def branch = System.getenv().GIT_BRANCH
+		return branch.substring(branch.lastIndexOf("/") + 1)
+	}
+	if (grgit == null) {
+		return "unknown"
+	}
+	def branch = grgit.branch.current().name
+	return branch.substring(branch.lastIndexOf("/") + 1)
+}
+
+allprojects {
+
+	apply plugin: 'checkstyle'
+	apply plugin: 'maven-publish'
+	apply plugin: 'fabric-loom'
+	apply plugin: 'net.minecrell.licenser'
+
+	sourceCompatibility = JavaVersion.VERSION_1_8
+	targetCompatibility = JavaVersion.VERSION_1_8
+
+	group = "com.terraformersmc.terraform"
+
+	sourceSets {
+		testmod {
+			compileClasspath += main.compileClasspath
+			runtimeClasspath += main.runtimeClasspath
+		}
+	}
+
+	dependencies {
+		minecraft "com.mojang:minecraft:${Globals.minecraft_version}"
+
+		mappings "net.fabricmc:yarn:${Globals.minecraft_version}${Globals.yarn_version}:v2"
+
+		modImplementation "net.fabricmc:fabric-loader:${Globals.loader_version}"
+
+		modImplementation "net.fabricmc.fabric-api:fabric-api:${Globals.fabric_version}"
+
+		modImplementation "io.github.prospector:modmenu:${Globals.modmenu_version}"
+	}
+
+	configurations {
+		dev
+	}
+
+	repositories {
+		mavenLocal()
+	}
+
+	jar {
+		classifier = "dev"
+	}
+
+	afterEvaluate {
+		remapJar {
+			input = file("${project.buildDir}/libs/$archivesBaseName-${version}-dev.jar")
+			archiveName = "${archivesBaseName}-${version}.jar"
+		}
+
+		artifacts {
+			dev file: file("${project.buildDir}/libs/$archivesBaseName-${version}-dev.jar"), type: "jar", builtBy: jar
+		}
+
+		processResources {
+			inputs.property "version", project.version
+
+			from(sourceSets.main.resources.srcDirs) {
+				include "fabric.mod.json"
+				expand "version": project.version
+			}
+
+			from(sourceSets.main.resources.srcDirs) {
+				exclude "fabric.mod.json"
+			}
+		}
+
+		license {
+			header rootProject.file('HEADER')
+			include '**/*.java'
+		}
+	}
+
+	task sourcesJar(type: Jar, dependsOn: classes) {
+		classifier = 'sources'
+		from sourceSets.main.allSource
+	}
+}
+
+subprojects {
+
+	dependencies {
+		testmodCompile sourceSets.main.output
+	}
+
+	task remapMavenJar(type: Copy, dependsOn: remapJar) {
+		afterEvaluate {
+			from("${project.buildDir}/libs/$archivesBaseName-${version}.jar")
+			into("${project.buildDir}/libs/")
+			rename { String fn -> "$archivesBaseName-${version}-maven.jar" }
+		}
+	}
+
+	javadoc.enabled = false
+}
+
+task remapMavenJar(type: net.fabricmc.loom.task.RemapJarTask, dependsOn: jar) {
+	afterEvaluate {
+		input = file("${project.buildDir}/libs/${archivesBaseName}-${version}-dev.jar")
+		archiveName = "${archivesBaseName}-${version}-maven.jar"
+		addNestedDependencies = false
+	}
+}
+
+task licenseFormatAll
+subprojects { p -> licenseFormatAll.dependsOn("${p.path}:licenseFormat") }
+subprojects.each { remapJar.dependsOn("${it.path}:remapJar") }
+
+sourceSets {
+	testmod
+}
 
 dependencies {
-    minecraft "com.mojang:minecraft:${project.minecraft_version}"
-    mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
-    modCompile "net.fabricmc:fabric-loader:${project.loader_version}"
-    modCompile "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+	afterEvaluate {
+		subprojects.each {
+			compile project(path: ":${it.name}", configuration: "dev")
+			include project("${it.name}:")
 
-	compileOnly "com.google.code.findbugs:jsr305:3.0.2"
-}
-
-processResources {
-    inputs.property "version", project.version
-
-    from(sourceSets.main.resources.srcDirs) {
-        include "fabric.mod.json"
-        expand "version": project.version
-    }
-
-    from(sourceSets.main.resources.srcDirs) {
-        exclude "fabric.mod.json"
-    }
-}
-
-tasks.withType(JavaCompile) {
-    options.encoding = "UTF-8"
-}
-
-task sourcesJar(type: Jar, dependsOn: classes) {
-    classifier = "sources"
-    from sourceSets.main.allSource
-}
-
-jar {
-    from "LICENSE"
-}
-
-publishing {
-    publications {
-        mavenJava(MavenPublication) {
-            artifact(sourcesJar) {
-                builtBy remapSourcesJar
-            }
-
-            afterEvaluate {
-				artifact remapJar
-            }
-        }
-    }
-
-    repositories {
-        if (project.hasProperty('mavenPass')) {
-            maven {
-                url = "http://mavenupload.modmuss50.me/"
-                credentials {
-                    username = "buildslave"
-                    password = project.getProperty('mavenPass')
-                }
-            }
-        }
-    }
+			testmodCompile project("${it.name}:").sourceSets.testmod.output
+		}
+	}
 }

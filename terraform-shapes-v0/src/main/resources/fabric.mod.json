@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "id": "terraform-shapes",
+  "version": "${version}",
+  "name": "Terraform Shapes",
+  "description": "Powerful voxel based shapes library",
+  "authors": [
+    "TerraformersMC"
+  ],
+  "contact": {
+    "homepage": "https://github.com/TerraformersMC/terraform",
+    "sources": "https://github.com/TerraformersMC/terraform",
+    "issues": "https://github.com/TerraformersMC/terraform/issues"
+  },
+  "license": "LGPL-3.0",
+  "icon": "assets/terraform-shapes-v0/icon.png",
+  "environment": "*",
+  "custom": {
+    "modmenu:parent": "terraform"
+  },
+  "mixins": [
+    "terraform-shapes-v0.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=0.7.4"
+  }
+}
