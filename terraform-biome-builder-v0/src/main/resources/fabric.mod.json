@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "id": "terraform-biome-builder",
+  "id": "terraform-biome-builder-v0",
   "version": "${version}",
   "name": "Terraform Biome Builder",
   "description": "Helper classes for creating new biomes",
@@ -23,5 +23,6 @@
   ],
   "depends": {
     "fabricloader": ">=0.7.4"
-  }
+  },
+  "accessWidener" : "terraform-biome-builder-v0.accesswidener"
 }

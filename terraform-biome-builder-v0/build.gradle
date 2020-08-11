@@ -1,5 +1,5 @@
 archivesBaseName = "terraform-biome-builder-v0"
-version = getSubprojectVersion(project, "1.0.0")
+version = getSubprojectVersion(project, "0.0.0")
 
 dependencies {
     compile project(path: ':terraform-base', configuration: 'dev')

@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "id": "terraform-shapes",
+  "id": "terraform-shapes-v0",
   "version": "${version}",
   "name": "Terraform Shapes",
   "description": "Powerful voxel based shapes library",

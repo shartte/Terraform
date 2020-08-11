@@ -64,8 +64,6 @@ def getBranch() {
 
 allprojects {
 
-	apply plugin: 'checkstyle'
-	apply plugin: 'maven-publish'
 	apply plugin: 'fabric-loom'
 	apply plugin: 'net.minecrell.licenser'
 
