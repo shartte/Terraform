@@ -8,6 +8,7 @@ import net.minecraft.world.biome.DefaultBiomeCreator;
 
 @SuppressWarnings("unused")
 public class BiomeBuilderTest implements ModInitializer {
+
     @Override
     public void onInitialize() {
 
