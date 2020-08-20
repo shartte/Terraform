@@ -11,7 +11,7 @@ public class BiomeBuilderTest implements ModInitializer {
     @Override
     public void onInitialize() {
 
-        TerraformBiomes.addOverworldBiome(new Identifier("yeet"), DefaultBiomeCreator.createPlains(false));
+        TerraformBiomes.addOverworldBiome(new Identifier("terraform", "yeet"), DefaultBiomeCreator.createPlains(false));
 
         System.out.println("Hey grrl hey!");
     }
