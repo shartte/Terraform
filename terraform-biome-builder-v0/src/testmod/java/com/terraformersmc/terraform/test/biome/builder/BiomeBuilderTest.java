@@ -1,7 +1,6 @@
 package com.terraformersmc.terraform.test.biome.builder;
 
-import com.terraformersmc.terraform.api.biome.builder.OverworldClimate;
-import com.terraformersmc.terraform.impl.biome.builder.BiomeRegistry;
+import com.terraformersmc.terraform.impl.biome.builder.TerraformBiomes;
 import net.fabricmc.api.ModInitializer;
 import net.minecraft.util.Identifier;
 import net.minecraft.world.biome.DefaultBiomeCreator;
@@ -12,7 +11,7 @@ public class BiomeBuilderTest implements ModInitializer {
     @Override
     public void onInitialize() {
 
-        BiomeRegistry.addOverworldBiome(new Identifier("yeet"), DefaultBiomeCreator.createBasaltDeltas(), OverworldClimate.COOL);
+        TerraformBiomes.addOverworldBiome(new Identifier("yeet"), DefaultBiomeCreator.createPlains(false));
 
         System.out.println("Hey grrl hey!");
     }

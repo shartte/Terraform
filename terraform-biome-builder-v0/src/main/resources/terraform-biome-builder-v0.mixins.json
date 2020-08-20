@@ -4,6 +4,7 @@
   "package": "com.terraformersmc.terraform.mixin.biome.builder",
   "compatibilityLevel": "JAVA_8",
   "mixins": [
+    "AccessorBiomes"
   ],
   "injectors": {
     "defaultRequire": 1
